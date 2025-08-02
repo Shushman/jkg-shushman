@@ -5,10 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "bunx --bun vite",
-    "build": "bun run css:build && bunx --bun vite build",
+    "build": "bunx --bun vite build",
     "preview": "bunx --bun vite preview",
-    "css:build": "bunx tailwindcss -i ./styles.css -o ./dist/styles.css --watch",
-    "css:dev": "bunx tailwindcss -i ./styles.css -o ./styles.css --watch"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",
