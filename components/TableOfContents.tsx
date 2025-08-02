@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface TocItem {
   id: string;
@@ -9,6 +10,7 @@ interface TocItem {
 export default function TableOfContents() {
   const [tocItems, setTocItems] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState<string>('');
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   useEffect(() => {
     // Extract headings from the document
@@ -66,31 +68,43 @@ export default function TableOfContents() {
   };
 
   return (
-    <nav className="bg-white rounded-xl shadow-sm border border-gray-100">
+    <nav className="bg-white rounded-lg shadow-sm border border-gray-100 w-full max-w-[220px]">
       <div className="px-3 py-2 border-b border-gray-100">
-        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          Contents
-        </div>
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="flex items-center justify-between w-full text-left hover:bg-gray-50 rounded transition-colors duration-200"
+        >
+          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            Contents
+          </div>
+          {isCollapsed ? (
+            <ChevronDown className="w-3 h-3 text-gray-400" />
+          ) : (
+            <ChevronUp className="w-3 h-3 text-gray-400" />
+          )}
+        </button>
       </div>
-      <div className="p-2">
-        <ul>
-          {tocItems.map((item) => (
-            <li key={item.id}>
-              <button
-                onClick={() => scrollToHeading(item.id)}
-                className={`block w-full text-left py-0.5 px-2 text-sm rounded transition-colors duration-200 ${
-                  item.level === 3 ? 'ml-3 text-xs' : ''
-                } ${
-                  activeId === item.id
-                    ? 'text-blue-600 font-medium bg-blue-50'
-                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
-                }`}
-              >
-                {item.text}
-              </button>
-            </li>
-          ))}
-        </ul>
+      <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'max-h-0' : 'max-h-96'}`}>
+        <div className="p-2">
+          <ul>
+            {tocItems.map((item) => (
+              <li key={item.id}>
+                <button
+                  onClick={() => scrollToHeading(item.id)}
+                  className={`block w-full text-left py-0.5 px-2 text-xs rounded transition-colors duration-200 leading-snug ${
+                    item.level === 3 ? 'ml-2 text-xs' : ''
+                  } ${
+                    activeId === item.id
+                      ? 'text-blue-600 font-medium bg-blue-50'
+                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {item.text}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </nav>
   );

@@ -6,113 +6,95 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply font-crimson text-gray-800 text-lg leading-relaxed bg-gradient-to-br from-slate-50 via-white to-slate-50 min-h-screen;
-  }
+/* Keep only essential base styles that can't be easily applied as utilities */
+body {
+  font-family: 'Crimson Text', Georgia, serif;
+}
 
-  h1 {
-    @apply font-inter text-4xl lg:text-5xl font-bold mb-8 leading-tight text-gray-900 tracking-tight;
-  }
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
+}
 
-  h2 {
-    @apply font-inter text-2xl lg:text-3xl font-semibold mt-12 mb-6 pb-3 border-b border-gray-200 text-gray-800 tracking-tight;
-  }
+code, pre {
+  font-family: 'JetBrains Mono', monospace;
+}
 
-  h3 {
-    @apply font-inter text-xl lg:text-2xl font-semibold mt-8 mb-4 text-gray-700 tracking-tight;
-  }
+/* Essential code block styling that can't be easily done with utilities */
+pre {
+  background-color: #111827 !important;
+  border-radius: 0.75rem !important;
+  overflow-x: auto !important;
+  margin: 2rem 0 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
 
-  p {
-    @apply mb-6 text-gray-700 leading-relaxed max-w-none;
-  }
+pre code {
+  font-family: 'JetBrains Mono', monospace !important;
+  display: block !important;
+  padding: 1.5rem !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.625 !important;
+  color: #e5e7eb !important;
+  font-weight: normal !important;
+}
 
-  code {
-    @apply font-mono bg-gray-100 px-2 py-1 rounded-md text-sm font-medium text-amber-700 border border-gray-200;
-  }
+/* Math display styling */
+.katex {
+  font-size: 1.125rem !important;
+}
 
-  pre {
-    @apply bg-gray-900 rounded-xl overflow-x-auto my-8 shadow-lg;
-  }
+.katex-display {
+  text-align: center !important;
+  margin: 2.5rem 0 !important;
+  padding: 1rem !important;
+  background: white !important;
+  border-radius: 0.5rem !important;
+  border: 1px solid #e5e7eb !important;
+}
 
-  pre code {
-    @apply font-mono block p-6 bg-transparent border-0 rounded-none text-sm leading-relaxed text-gray-200 font-normal;
-  }
+/* Breakout figure and interactive elements */
+.breakout-figure,
+.breakout-interactive {
+  /* Simple approach: just break out of the article container */
+  margin-left: -2rem;
+  margin-right: -2rem;
+}
 
-  ul, ol {
-    @apply my-6 pl-8;
-  }
-
-  li {
-    @apply mb-3 leading-relaxed;
-  }
-
-  a {
-    @apply text-blue-600 font-medium no-underline transition-colors duration-200 hover:text-blue-800 hover:underline;
-  }
-
-  blockquote {
-    @apply border-l-4 border-blue-500 pl-6 my-8 italic text-gray-600 bg-slate-50 p-6 rounded-lg;
-  }
-
-  .katex {
-    @apply text-lg;
-  }
-
-  .katex-display {
-    @apply my-8 p-4 bg-white rounded-lg border border-gray-200;
+@media (min-width: 640px) {
+  .breakout-figure,
+  .breakout-interactive {
+    margin-left: -3rem;
+    margin-right: -3rem;
   }
 }
 
-@layer components {
-  .figure {
-    @apply my-12 text-center bg-gradient-to-br from-slate-50 to-white p-8 rounded-xl border border-slate-200 shadow-sm;
-  }
-
-  .figure-caption {
-    @apply font-inter text-sm text-slate-600 mt-4 italic leading-relaxed max-w-3xl mx-auto;
-  }
-
-  .interactive-element {
-    @apply bg-gradient-to-br from-blue-50 to-slate-50 border border-blue-200 rounded-xl p-8 lg:p-10 my-12 shadow-sm;
-  }
-
-  .interactive-element h3 {
-    @apply mt-0 text-slate-800 border-b border-blue-200 pb-3 mb-6 font-semibold;
-  }
-
-  .math-display {
-    @apply text-center my-10 p-6 bg-white rounded-xl border border-gray-200 shadow-sm;
-  }
-
-  .slider-container {
-    @apply my-6;
-  }
-
-  .parameter-display {
-    @apply font-mono bg-blue-100 text-blue-900 px-4 py-3 rounded-lg inline-block my-4 border border-blue-200 font-medium text-sm;
+@media (min-width: 1024px) {
+  .breakout-figure,
+  .breakout-interactive {
+    margin-left: -6rem;
+    margin-right: -6rem;
   }
 }
 
-/* Responsive styles */
+/* Responsive overrides */
 @media (max-width: 1024px) {
-  .lg\:grid-cols-\[280px_1fr\] {
-    @apply grid-cols-1;
+  .lg\:grid-cols-\[240px_1fr\] {
+    grid-template-columns: 1fr;
   }
   
   .lg\:sticky {
-    @apply static;
+    position: static;
   }
   
-  h1 {
-    @apply text-4xl;
+  .lg\:grid-cols-\[240px_1fr\] aside {
+    order: 2;
+    margin-top: 2rem;
   }
   
-  .lg\:grid-cols-\[280px_1fr\] aside {
-    @apply order-2 mt-8;
-  }
-  
-  .lg\:grid-cols-\[280px_1fr\] article {
-    @apply order-1;
+  .lg\:grid-cols-\[240px_1fr\] .article-container {
+    order: 1;
   }
 }
