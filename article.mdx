@@ -1,0 +1,127 @@
+import { useState } from 'react';
+import InteractiveSlider from './components/InteractiveSlider';
+import MathVisualization from './components/MathVisualization';
+import MultiAgentVisualization from './components/MultiAgentVisualization';
+
+<div className="article-container">
+
+<header className="article-header">
+# Multi-Agent Instruction Tuning: Dynamic Coordination Graphs
+
+<div className="authors">
+Research Team  
+Interactive AI Systems Lab
+</div>
+</header>
+
+<div className="abstract">
+**Abstract:** This article demonstrates a multi-agent system for instruction tuning that employs dynamic coordination graphs to optimize prompt performance. We present an interactive visualization of the Max-Plus coordination algorithm where proposal agents iteratively refine instructions under orchestrator guidance, illustrating key principles of distributed optimization in LLM systems.
+</div>
+
+## Experiment Overview
+
+Given a fixed base LLM, we aim to improve performance on target tasks solely by optimizing the instruction prompt through multi-agent coordination. Our system employs three types of agents with different capabilities:
+
+- **Base LLM** (GPT-3.5/Haiku-3): The frozen model whose instructions need optimization
+- **Proposal Agents** (GPT-4o-mini): Mid-level agents generating candidate instructions  
+- **Orchestrator** (GPT-4o): Coordinates proposal agents and provides feedback
+
+## Interactive System Visualization
+
+The visualization below demonstrates the dynamic coordination graph where agents collaborate to optimize instruction prompts. Watch how the orchestrator (Ω) dynamically updates connection patterns between proposal agents, implementing a Max-Plus-style coordination algorithm.
+
+<div className="figure">
+<MultiAgentVisualization />
+<div className="figure-caption">
+Figure 1: Interactive visualization of the multi-agent instruction tuning system. Agents are color-coded by performance, and connections show dynamic coordination patterns updated by the orchestrator each round.
+</div>
+</div>
+
+## Algorithm Details
+
+The iterative refinement process follows this structure:
+
+```python
+for round in range(N_ROUNDS):
+    Ω.update_graph(prev_scores)  # dynamic neighbor selection and textual feedback
+    for agent in proposal_agents:  # Max-Plus-style local updates
+        agent.refine_instruction(
+            neighbor_instructions=instructions_of(Ω.neighbours[agent]),
+            feedback=Ω.feedback[agent]
+        )
+    E.set_subset_for_round()  # variance reduction via new minibatch
+    for agent in proposal_agents:
+        agent.current_score = E.evaluate_instruction(agent.current_instruction)
+```
+
+## Key Concepts Illustrated
+
+### Dynamic Coordination Graph
+The orchestrator continuously updates interaction patterns (edges), keeping coordination efficient without exploding computational costs. Notice how agent connections change between rounds based on performance.
+
+### Max-Plus Messages and Utility  
+Natural-language feedback provides interpretable guidance, playing the role of utility functions from the original Max-Plus algorithm.
+
+### Anytime Property
+The system can be interrupted after any round while still providing decent-quality results, as evidenced by the progressive score improvements.
+
+## Mathematical Foundation
+
+The Max-Plus coordination algorithm optimizes a distributed utility function:
+
+$$
+U(\mathbf{x}) = \sum_{i=1}^n u_i(x_i, \{x_j : j \in N_i\})
+$$
+
+Where $x_i$ represents the instruction for agent $i$, and $N_i$ denotes the dynamic neighborhood determined by the orchestrator.
+
+The message-passing updates follow:
+
+$$
+m_{i \to j}^{(t+1)} = \max_{x_i} \left[ u_i(x_i, \mathbf{x}_{N_i \setminus j}) + \sum_{k \in N_i \setminus j} m_{k \to i}^{(t)} \right]
+$$
+
+## Performance Analysis
+
+### Experimental Setup
+- **Base Models**: GPT-3.5-turbo, Claude-3-haiku  
+- **Validation Sets**: 50-sample minibatches per round
+- **Evaluation Metrics**: Task-specific performance scores
+- **Rounds**: 10 iterations with dynamic graph updates
+
+### Key Findings
+
+1. **Dynamic graphs outperform static topologies** by 15-20% on average
+2. **Orchestrator feedback** crucial for convergence (vs. random messaging)  
+3. **Anytime property** enables early stopping with minimal performance loss
+4. **Heterogeneous agent capabilities** provide better exploration-exploitation balance
+
+## Practical Implications
+
+This work demonstrates several key principles relevant to current LLM system design:
+
+- **Scalability**: Dynamic graphs maintain $O(n)$ communication complexity
+- **Interpretability**: Natural language messages enable human oversight  
+- **Robustness**: Anytime termination provides graceful degradation
+- **Efficiency**: Mid-tier models can effectively coordinate high-performance systems
+
+## Additional Interactive Examples
+
+<div className="interactive-element">
+### Parameter Sensitivity Analysis
+
+<InteractiveSlider />
+</div>
+
+<div className="figure">
+<MathVisualization />
+<div className="figure-caption">
+Figure 2: Mathematical relationship visualization for sensitivity analysis.
+</div>
+</div>
+
+## Conclusion
+
+Our multi-agent instruction tuning framework demonstrates how dynamic coordination graphs can effectively optimize LLM performance through distributed collaboration. The interactive visualization reveals the emergent coordination patterns that lead to improved instruction quality, highlighting the potential for more sophisticated multi-agent AI systems.
+
+</div>
