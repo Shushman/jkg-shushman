@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bunx --bun vite",
     "build": "bunx --bun vite build",
-    "preview": "bunx --bun vite preview",
+    "preview": "bunx --bun vite preview"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",
