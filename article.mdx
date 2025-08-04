@@ -4,6 +4,7 @@ import MathVisualization from './components/MathVisualization';
 import MultiAgentVisualization from './components/MultiAgentVisualization';
 import DistillHeader from './components/DistillHeader';
 import TableOfContents from './components/TableOfContents';
+import MultiAgentMappingVisualization from './components/MultiAgentMappingVisualization';
 
 <DistillHeader 
   title="Scalable and Anytime Coordination for Multi-LLM Systems"
@@ -41,11 +42,25 @@ In this post, we explore how ideas from the multi-agent decision-making literatu
 
 The core idea of our paper was to prioritize online scaling, i.e., inference-time efficient scaling, in sequential multi-agent decision settings. It combined two key pillars:
 
-Message Passing on a Coordination Graph: Using the MaxPlus algorithm, each agent shares messages with its neighbors to efficiently identify high-value joint actions without enumerating the exponentially large joint action space. Because Max-Plus is iterative, it yields usable solutions even if stopped early, making it ideal for real-time applications.
-
-Monte-Carlo Tree Search: MCTS strategically allocates simulation effort to likely states and continuously improves value estimates. We integrated Max-Plus at each tree node, maintaining the flexibility and anytime performance of MCTS as it scales to handle dynamic scenarios involving many agents.
+- Message Passing on a Coordination Graph: Using the MaxPlus algorithm, each agent shares messages with its neighbors to efficiently identify high-value joint actions without enumerating the exponentially large joint action space. Because Max-Plus is iterative, it yields usable solutions even if stopped early, making it ideal for real-time applications.
+- Monte-Carlo Tree Search: MCTS strategically allocates simulation effort to likely states and continuously improves value estimates. We integrated Max-Plus at each tree node, maintaining the flexibility and anytime performance of MCTS as it scales to handle dynamic scenarios involving many agents.
 
 Though our numerical experiments were on simplified settings, they showed how we could match or outperform exact, i.e., non-anytime baseline methods while running significantly faster and handling instances that baselines could not manage due to memory constraints. The key insight is that integrating factorized coordination and iterative message passing into tree search enables scalable and anytime multi-agent coordination in sequential decision-making scenarios.
+
+## Mapping our ingredients to Multi-LLM systems
+
+        </div>
+    </article>
+    <div className="breakout-figure my-16">
+        <div className="bg-gradient-to-br from-slate-50 to-white p-8 lg:p-12 rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto">
+            <MultiAgentMappingVisualization />
+            <div className="font-inter text-sm text-slate-600 mt-6 italic leading-relaxed text-center max-w-4xl mx-auto">
+                Figure: Interactive mapping between multi-agent coordination concepts and practical LLM system implementations. Click to explore connections.
+            </div>
+        </div>
+    </div>
+      <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden max-w-4xl mx-auto">
+        <div className="article-content p-8 sm:p-12 font-crimson text-gray-800 text-lg leading-relaxed prose prose-lg max-w-none prose-headings:font-inter prose-headings:tracking-tight prose-h1:text-4xl prose-h1:lg:text-5xl prose-h1:font-bold prose-h1:mb-8 prose-h1:text-gray-900 prose-h2:text-2xl prose-h2:lg:text-3xl prose-h2:font-semibold prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-200 prose-h2:text-gray-800 prose-h3:text-xl prose-h3:lg:text-2xl prose-h3:font-semibold prose-h3:mt-8 prose-h3:mb-4 prose-h3:text-gray-700 prose-p:mb-6 prose-p:text-gray-700 prose-p:leading-relaxed prose-code:font-mono prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:text-sm prose-code:font-medium prose-code:text-amber-700 prose-code:border prose-code:border-gray-200 prose-pre:bg-gray-900 prose-pre:rounded-xl prose-pre:my-8 prose-pre:shadow-lg prose-pre:code:block prose-pre:code:p-6 prose-pre:code:bg-transparent prose-pre:code:border-0 prose-pre:code:rounded-none prose-pre:code:text-sm prose-pre:code:leading-relaxed prose-pre:code:text-gray-200 prose-pre:code:font-normal prose-ul:my-6 prose-ul:pl-8 prose-ol:my-6 prose-ol:pl-8 prose-li:mb-3 prose-li:leading-relaxed prose-a:text-blue-600 prose-a:font-medium prose-a:no-underline prose-a:transition-colors prose-a:duration-200 hover:prose-a:text-blue-800 hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-6 prose-blockquote:my-8 prose-blockquote:italic prose-blockquote:text-gray-600 prose-blockquote:bg-slate-50 prose-blockquote:p-6 prose-blockquote:rounded-lg">
 
 
 ## Interactive System Visualization
