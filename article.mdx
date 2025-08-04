@@ -2,40 +2,92 @@ import { useState } from 'react';
 import InteractiveSlider from './components/InteractiveSlider';
 import MathVisualization from './components/MathVisualization';
 import MultiAgentVisualization from './components/MultiAgentVisualization';
+import DistillHeader from './components/DistillHeader';
+import TableOfContents from './components/TableOfContents';
+import MultiAgentMappingVisualization from './components/MultiAgentMappingVisualization';
 
-<div className="article-container">
+<DistillHeader 
+  title="Scalable and Anytime Coordination for Multi-LLM Systems"
+  authors={[
+    { name: "Shushman Choudhury", url: "https://shushman.github.io/" },
+    { name: "Jayesh K. Gupta", url: "https://rejuvyesh.com/" }
+  ]}
+  publishDate="August 2025"
+  description="Exploring how multi-agent decision-making principles can enhance modern multi-LLM systems through dynamic coordination and anytime algorithms."
+/>
 
-<header className="article-header">
-# Multi-Agent Instruction Tuning: Dynamic Coordination Graphs
+<div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-12 relative">
+    <aside className="lg:sticky lg:top-8 lg:h-fit">
+      <TableOfContents />
+    </aside>
+    <div className="article-container">
+      <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden max-w-4xl mx-auto">
+        <div className="article-content p-8 sm:p-12 font-crimson text-gray-800 text-lg leading-relaxed prose prose-lg max-w-none prose-headings:font-inter prose-headings:tracking-tight prose-h1:text-4xl prose-h1:lg:text-5xl prose-h1:font-bold prose-h1:mb-8 prose-h1:text-gray-900 prose-h2:text-2xl prose-h2:lg:text-3xl prose-h2:font-semibold prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-200 prose-h2:text-gray-800 prose-h3:text-xl prose-h3:lg:text-2xl prose-h3:font-semibold prose-h3:mt-8 prose-h3:mb-4 prose-h3:text-gray-700 prose-p:mb-6 prose-p:text-gray-700 prose-p:leading-relaxed prose-code:font-mono prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:text-sm prose-code:font-medium prose-code:text-amber-700 prose-code:border prose-code:border-gray-200 prose-pre:bg-gray-900 prose-pre:rounded-xl prose-pre:my-8 prose-pre:shadow-lg prose-pre:code:block prose-pre:code:p-6 prose-pre:code:bg-transparent prose-pre:code:border-0 prose-pre:code:rounded-none prose-pre:code:text-sm prose-pre:code:leading-relaxed prose-pre:code:text-gray-200 prose-pre:code:font-normal prose-ul:my-6 prose-ul:pl-8 prose-ol:my-6 prose-ol:pl-8 prose-li:mb-3 prose-li:leading-relaxed prose-a:text-blue-600 prose-a:font-medium prose-a:no-underline prose-a:transition-colors prose-a:duration-200 hover:prose-a:text-blue-800 hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-6 prose-blockquote:my-8 prose-blockquote:italic prose-blockquote:text-gray-600 prose-blockquote:bg-slate-50 prose-blockquote:p-6 prose-blockquote:rounded-lg">
 
-<div className="authors">
-Research Team  
-Interactive AI Systems Lab
-</div>
-</header>
+*This work is a personal project and does not reflect our current employment in any way.*
 
-<div className="abstract">
-**Abstract:** This article demonstrates a multi-agent system for instruction tuning that employs dynamic coordination graphs to optimize prompt performance. We present an interactive visualization of the Max-Plus coordination algorithm where proposal agents iteratively refine instructions under orchestrator guidance, illustrating key principles of distributed optimization in LLM systems.
-</div>
+The frontier of Large language models (LLMs) has moved beyond chatbots and individual models to systems composed of multiple LLMs (each with potentially different skills, latency profiles, price points, and capabilities) working together on complex multi-step tasks. Such systems power emerging tools like Google’s Vertex AI, Perplexity Labs’ multi-agent orchestration, OpenAI’s deep research assistant, and Anthropic’s computer use, where multiple LLMs, search, and tool calls run in parallel or interleave through multiple steps of reasoning.
 
-## Experiment Overview
+Yet without thoughtful multi-agent design  principles, these systems may struggle in the wild. Tasks might stall if a single model blocks the pipeline. One agent might take an action that is unsuitable for another agent later in the workflow. Downstream modules might wait unnecessarily on dependent tasks instead of starting independent ones. To overcome these and other challenges in a principled way, models must not only generate good outputs and make good decisions individually. They must also coordinate their reasoning and actions with each other. Such coordination problems are ones the multi-agent systems (MAS) and multi-agent reinforcement learning communities have long grappled with and that multi-LLM systems are equally vulnerable to.
 
-Given a fixed base LLM, we aim to improve performance on target tasks solely by optimizing the instruction prompt through multi-agent coordination. Our system employs three types of agents with different capabilities:
+The shift toward agentic training methods like Reinforcement Learning with Verifiable Rewards (RLVR), an active area of research, will only increase the complexity of multi-LLM systems. Models like OpenAI’s O3, xAI’s Grok-4, and Deepseek R1 tend to focus on domains like math and code where output correctness is easily verifiable. Such a focus creates increasingly specialized models, each better at different tasks. The upshot is that they become more uneven and harder to slot into general-purpose workflows. For instance, OpenAI maintains distinct versions of O3 for standard chat and “deep research” because of these capability tradeoffs. As agent specialization grows, so does the need for systems that can coordinate diverse agents.
 
-- **Base LLM** (GPT-3.5/Haiku-3): The frozen model whose instructions need optimization
-- **Proposal Agents** (GPT-4o-mini): Mid-level agents generating candidate instructions  
-- **Orchestrator** (GPT-4o): Coordinates proposal agents and provides feedback
+The need for scalable and robust multi-agent coordination leads to important computational tradeoffs with another desirable property of multi-LLM systems, i.e., supporting anytimeness or being interruptible in a principled way. In many complex and multi-step applications—from deep research to automated coding to long-form content generation—users often want meaningful partial answers before full completion. Wouldn’t it be great if we could ask the deep research agent to give a current meaningful summary of its progress and findings after a few minutes, while it continues to research the topic and develop the report over many hours?
+
+## Our Idea: MaxPlus with Search
+
+In this post, we explore how ideas from the multi-agent decision-making literature—specifically, our prior work Scalable Online Planning for Multi-Agent MDPs (Best Paper at AAMAS 2021, Journal of AI Research 2022)—can be valuable for modern multi-LLM systems. The LLM agent space is moving at breakneck speed; our goal was to identify some enduring and evergreen principles and to paint a picture of how well-established coordination algorithms can help address today’s most pressing challenges in building scalable, interruptible, and cost-effective multi-LLM applications.
+
+The core idea of our paper was to prioritize online scaling, i.e., inference-time efficient scaling, in sequential multi-agent decision settings. It combined two key pillars:
+
+- Message Passing on a Coordination Graph: Using the MaxPlus algorithm, each agent shares messages with its neighbors to efficiently identify high-value joint actions without enumerating the exponentially large joint action space. Because Max-Plus is iterative, it yields usable solutions even if stopped early, making it ideal for real-time applications.
+- Monte-Carlo Tree Search: MCTS strategically allocates simulation effort to likely states and continuously improves value estimates. We integrated Max-Plus at each tree node, maintaining the flexibility and anytime performance of MCTS as it scales to handle dynamic scenarios involving many agents.
+
+Though our numerical experiments were on simplified settings, they showed how we could match or outperform exact, i.e., non-anytime baseline methods while running significantly faster and handling instances that baselines could not manage due to memory constraints. The key insight is that integrating factorized coordination and iterative message passing into tree search enables scalable and anytime multi-agent coordination in sequential decision-making scenarios.
+
+        </div>
+    </article>
+    <div className="breakout-figure my-16">
+            <MultiAgentMappingVisualization />
+            <div className="font-inter text-sm text-slate-600 mt-6 italic leading-relaxed text-center max-w-4xl mx-auto">
+                Figure 1: Mapping our ingredients to Multi-LLM systems. Click to explore.
+            </div>
+    </div>
+      <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden max-w-4xl mx-auto">
+        <div className="article-content p-8 sm:p-12 font-crimson text-gray-800 text-lg leading-relaxed prose prose-lg max-w-none prose-headings:font-inter prose-headings:tracking-tight prose-h1:text-4xl prose-h1:lg:text-5xl prose-h1:font-bold prose-h1:mb-8 prose-h1:text-gray-900 prose-h2:text-2xl prose-h2:lg:text-3xl prose-h2:font-semibold prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-200 prose-h2:text-gray-800 prose-h3:text-xl prose-h3:lg:text-2xl prose-h3:font-semibold prose-h3:mt-8 prose-h3:mb-4 prose-h3:text-gray-700 prose-p:mb-6 prose-p:text-gray-700 prose-p:leading-relaxed prose-code:font-mono prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:text-sm prose-code:font-medium prose-code:text-amber-700 prose-code:border prose-code:border-gray-200 prose-pre:bg-gray-900 prose-pre:rounded-xl prose-pre:my-8 prose-pre:shadow-lg prose-pre:code:block prose-pre:code:p-6 prose-pre:code:bg-transparent prose-pre:code:border-0 prose-pre:code:rounded-none prose-pre:code:text-sm prose-pre:code:leading-relaxed prose-pre:code:text-gray-200 prose-pre:code:font-normal prose-ul:my-6 prose-ul:pl-8 prose-ol:my-6 prose-ol:pl-8 prose-li:mb-3 prose-li:leading-relaxed prose-a:text-blue-600 prose-a:font-medium prose-a:no-underline prose-a:transition-colors prose-a:duration-200 hover:prose-a:text-blue-800 hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-6 prose-blockquote:my-8 prose-blockquote:italic prose-blockquote:text-gray-600 prose-blockquote:bg-slate-50 prose-blockquote:p-6 prose-blockquote:rounded-lg">
+
+## Key Implications for Multi-LLM Systems
+
+1. Anytime Responses: The Max-Plus/MCTS combination enables a useful partial solution at every step. Even with a limited execution window, the system can provide coherent intermediate outputs essential for real-time interfaces and latency-sensitive applications.
+2. Decentralized Parallelism: Local message exchanges between agents yields parallel processing of instruction refinements or sub-problem solving. Tree search manages these concurrent "local conversations," allowing several LLM calls or retrieval operations to execute simultaneously, essential for complex drafting and research use cases.
+3. Dynamic, Contextual Coordination: The orchestrator can continually update the coordination graph, i.e., who communicates with whom, based on current intermediate results in a principled way. This dynamic rewiring prioritizes resources effectively and offers greater flexibility compared to static routing methods.
+4. Interleaving reasoning with coordination. Multi-agent tree search can allow for branching some thoughts into parallel specialists, wait (or not) for their replies, fold results back in, and continue thinking. That process—reason a bit → coordinate → reason further—mirrors how human teams write papers, debug code, or draft reports.
+5. Explicit Trade-offs Between Quality and Cost: Parameters such as tree depth, agent count, neighbor limits, and batch size allow for more transparently balancing quality against resource expenditure.
+6. Structuring Multi-Agent Reinforcement Learning: Reinforcement learning over multi-LLM workflows faces challenges with credit assignment across multiple interactions and steps. Factored coordination graphs and Max-Plus tries to address this by propagating utilities along the coordination graph, providing a strong planning prior that supports scalable multi-agent reinforcement learning methods.
+7. Online Routing, Mixture-of-Experts-Style: Unlike static mixture-of-experts methods, our approach could dynamically route queries, refining or dropping specialists as needed during interactions. This adaptive process optimizes the conversation continuously within explicit budget constraints.
+
+Collectively, these principles and practices can lead to a structured, scalable, and resilient multi-LLM architecture, suitable for both prototype development and production-scale deployments.
 
 ## Interactive System Visualization
 
 The visualization below demonstrates the dynamic coordination graph where agents collaborate to optimize instruction prompts. Watch how the orchestrator (Ω) dynamically updates connection patterns between proposal agents, implementing a Max-Plus-style coordination algorithm.
 
-<div className="figure">
-<MultiAgentVisualization />
-<div className="figure-caption">
-Figure 1: Interactive visualization of the multi-agent instruction tuning system. Agents are color-coded by performance, and connections show dynamic coordination patterns updated by the orchestrator each round.
-</div>
-</div>
+        </div>
+      </article>
+      
+      <div className="breakout-figure my-16">
+        <div className="bg-gradient-to-br from-slate-50 to-white p-8 lg:p-12 rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto">
+          <MultiAgentVisualization />
+          <div className="font-inter text-sm text-slate-600 mt-6 italic leading-relaxed text-center max-w-4xl mx-auto">
+            Figure 1: Interactive visualization of the multi-agent instruction tuning system. Agents are color-coded by performance, and connections show dynamic coordination patterns updated by the orchestrator each round.
+          </div>
+        </div>
+      </div>
+      
+      <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden max-w-4xl mx-auto">
+        <div className="article-content p-8 sm:p-12 font-crimson text-gray-800 text-lg leading-relaxed prose prose-lg max-w-none prose-headings:font-inter prose-headings:tracking-tight prose-h1:text-4xl prose-h1:lg:text-5xl prose-h1:font-bold prose-h1:mb-8 prose-h1:text-gray-900 prose-h2:text-2xl prose-h2:lg:text-3xl prose-h2:font-semibold prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-200 prose-h2:text-gray-800 prose-h3:text-xl prose-h3:lg:text-2xl prose-h3:font-semibold prose-h3:mt-8 prose-h3:mb-4 prose-h3:text-gray-700 prose-p:mb-6 prose-p:text-gray-700 prose-p:leading-relaxed prose-code:font-mono prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:text-sm prose-code:font-medium prose-code:text-amber-700 prose-code:border prose-code:border-gray-200 prose-pre:bg-gray-900 prose-pre:rounded-xl prose-pre:my-8 prose-pre:shadow-lg prose-pre:code:block prose-pre:code:p-6 prose-pre:code:bg-transparent prose-pre:code:border-0 prose-pre:code:rounded-none prose-pre:code:text-sm prose-pre:code:leading-relaxed prose-pre:code:text-gray-200 prose-pre:code:font-normal prose-ul:my-6 prose-ul:pl-8 prose-ol:my-6 prose-ol:pl-8 prose-li:mb-3 prose-li:leading-relaxed prose-a:text-blue-600 prose-a:font-medium prose-a:no-underline prose-a:transition-colors prose-a:duration-200 hover:prose-a:text-blue-800 hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-6 prose-blockquote:my-8 prose-blockquote:italic prose-blockquote:text-gray-600 prose-blockquote:bg-slate-50 prose-blockquote:p-6 prose-blockquote:rounded-lg">
 
 ## Algorithm Details
 
@@ -107,21 +159,41 @@ This work demonstrates several key principles relevant to current LLM system des
 
 ## Additional Interactive Examples
 
-<div className="interactive-element">
-### Parameter Sensitivity Analysis
+        </div>
+      </article>
+      
+      <div className="breakout-interactive my-16">
+        <div className="bg-gradient-to-br from-blue-50 to-slate-50 border border-blue-200 rounded-xl p-8 lg:p-12 shadow-sm max-w-5xl mx-auto">
+          <h3 className="mt-0 text-slate-800 border-b border-blue-200 pb-3 mb-8 font-semibold text-2xl lg:text-3xl font-inter tracking-tight text-center">Parameter Sensitivity Analysis</h3>
+          <InteractiveSlider />
+        </div>
+      </div>
+      
+      <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden max-w-4xl mx-auto">
+        <div className="article-content p-8 sm:p-12 font-crimson text-gray-800 text-lg leading-relaxed prose prose-lg max-w-none prose-headings:font-inter prose-headings:tracking-tight prose-h1:text-4xl prose-h1:lg:text-5xl prose-h1:font-bold prose-h1:mb-8 prose-h1:text-gray-900 prose-h2:text-2xl prose-h2:lg:text-3xl prose-h2:font-semibold prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-200 prose-h2:text-gray-800 prose-h3:text-xl prose-h3:lg:text-2xl prose-h3:font-semibold prose-h3:mt-8 prose-h3:mb-4 prose-h3:text-gray-700 prose-p:mb-6 prose-p:text-gray-700 prose-p:leading-relaxed prose-code:font-mono prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:text-sm prose-code:font-medium prose-code:text-amber-700 prose-code:border prose-code:border-gray-200 prose-pre:bg-gray-900 prose-pre:rounded-xl prose-pre:my-8 prose-pre:shadow-lg prose-pre:code:block prose-pre:code:p-6 prose-pre:code:bg-transparent prose-pre:code:border-0 prose-pre:code:rounded-none prose-pre:code:text-sm prose-pre:code:leading-relaxed prose-pre:code:text-gray-200 prose-pre:code:font-normal prose-ul:my-6 prose-ul:pl-8 prose-ol:my-6 prose-ol:pl-8 prose-li:mb-3 prose-li:leading-relaxed prose-a:text-blue-600 prose-a:font-medium prose-a:no-underline prose-a:transition-colors prose-a:duration-200 hover:prose-a:text-blue-800 hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-6 prose-blockquote:my-8 prose-blockquote:italic prose-blockquote:text-gray-600 prose-blockquote:bg-slate-50 prose-blockquote:p-6 prose-blockquote:rounded-lg">
 
-<InteractiveSlider />
-</div>
-
-<div className="figure">
-<MathVisualization />
-<div className="figure-caption">
-Figure 2: Mathematical relationship visualization for sensitivity analysis.
-</div>
-</div>
+        </div>
+      </article>
+      
+      <div className="breakout-figure my-16">
+        <div className="bg-gradient-to-br from-slate-50 to-white p-8 lg:p-12 rounded-xl border border-slate-200 shadow-sm max-w-6xl mx-auto">
+          <MathVisualization />
+          <div className="font-inter text-sm text-slate-600 mt-6 italic leading-relaxed text-center max-w-4xl mx-auto">
+            Figure 2: Mathematical relationship visualization for sensitivity analysis.
+          </div>
+        </div>
+      </div>
+      
+      <article className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden max-w-4xl mx-auto">
+        <div className="article-content p-8 sm:p-12 font-crimson text-gray-800 text-lg leading-relaxed prose prose-lg max-w-none prose-headings:font-inter prose-headings:tracking-tight prose-h1:text-4xl prose-h1:lg:text-5xl prose-h1:font-bold prose-h1:mb-8 prose-h1:text-gray-900 prose-h2:text-2xl prose-h2:lg:text-3xl prose-h2:font-semibold prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-200 prose-h2:text-gray-800 prose-h3:text-xl prose-h3:lg:text-2xl prose-h3:font-semibold prose-h3:mt-8 prose-h3:mb-4 prose-h3:text-gray-700 prose-p:mb-6 prose-p:text-gray-700 prose-p:leading-relaxed prose-code:font-mono prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded-md prose-code:text-sm prose-code:font-medium prose-code:text-amber-700 prose-code:border prose-code:border-gray-200 prose-pre:bg-gray-900 prose-pre:rounded-xl prose-pre:my-8 prose-pre:shadow-lg prose-pre:code:block prose-pre:code:p-6 prose-pre:code:bg-transparent prose-pre:code:border-0 prose-pre:code:rounded-none prose-pre:code:text-sm prose-pre:code:leading-relaxed prose-pre:code:text-gray-200 prose-pre:code:font-normal prose-ul:my-6 prose-ul:pl-8 prose-ol:my-6 prose-ol:pl-8 prose-li:mb-3 prose-li:leading-relaxed prose-a:text-blue-600 prose-a:font-medium prose-a:no-underline prose-a:transition-colors prose-a:duration-200 hover:prose-a:text-blue-800 hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-6 prose-blockquote:my-8 prose-blockquote:italic prose-blockquote:text-gray-600 prose-blockquote:bg-slate-50 prose-blockquote:p-6 prose-blockquote:rounded-lg">
 
 ## Conclusion
 
 Our multi-agent instruction tuning framework demonstrates how dynamic coordination graphs can effectively optimize LLM performance through distributed collaboration. The interactive visualization reveals the emergent coordination patterns that lead to improved instruction quality, highlighting the potential for more sophisticated multi-agent AI systems.
 
+      </div>
+    </article>
+    </div>
+  </div>
+</div>
 </div>
