@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ScrollArea } from './ui/scroll-area';
 
 interface TocItem {
   id: string;
@@ -68,8 +69,8 @@ export default function TableOfContents() {
   };
 
   return (
-    <nav className="bg-white rounded-lg shadow-sm border border-gray-100 w-full max-w-[220px]">
-      <div className="px-3 py-2 border-b border-gray-100">
+    <nav className="bg-white rounded-lg shadow-sm border border-gray-100 w-full max-w-[280px] flex flex-col">
+      <div className="px-3 py-2 border-b border-gray-100 flex-shrink-0">
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="flex items-center justify-between w-full text-left hover:bg-gray-50 rounded transition-colors duration-200"
@@ -84,27 +85,35 @@ export default function TableOfContents() {
           )}
         </button>
       </div>
-      <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'max-h-0' : 'max-h-96'}`}>
-        <div className="p-2">
-          <ul>
-            {tocItems.map((item) => (
-              <li key={item.id}>
-                <button
-                  onClick={() => scrollToHeading(item.id)}
-                  className={`block w-full text-left py-0.5 px-2 text-xs rounded transition-colors duration-200 leading-snug ${
-                    item.level === 3 ? 'ml-2 text-xs' : ''
-                  } ${
-                    activeId === item.id
-                      ? 'text-blue-600 font-medium bg-blue-50'
-                      : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
-                >
-                  {item.text}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className={`overflow-hidden transition-all duration-300 flex-1 ${
+        isCollapsed 
+          ? 'max-h-0' 
+          : `max-h-[calc(100vh-12rem)] ${tocItems.length > 15 ? 'min-h-[400px]' : 'min-h-fit'}`
+      }`}>
+        <ScrollArea className="h-full">
+          <div className="p-2">
+            <ul className="space-y-0">
+              {tocItems.map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => scrollToHeading(item.id)}
+                    className={`block w-full text-left rounded transition-colors duration-200 leading-snug ${
+                      item.level === 3 
+                        ? 'ml-3 py-0.5 px-2 text-xs border-l-2 border-gray-100 pl-3' 
+                        : 'py-1.5 px-2 text-xs'
+                    } ${
+                      activeId === item.id
+                        ? 'text-blue-600 font-medium bg-blue-50 border-l-blue-300'
+                        : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    {item.text}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </ScrollArea>
       </div>
     </nav>
   );
